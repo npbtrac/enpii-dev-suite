@@ -4,6 +4,7 @@
 
 # Config file
 docker-compose.yml
+.env
 
 # Application
 web/app/composer.json
