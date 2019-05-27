@@ -1,32 +1,37 @@
 # Nginx configuration
 
 upstream backend_php {
-    server php7_2_15:9000       weight=5;
+    server php7_2:9000       weight=5;
+}
+
+upstream backend_php_56 {
+    server php5_6:9000       weight=5;
 }
 
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
-    server_name ${NGINX_HOST};
+    server_name local.enpii.com;
 
     index index.php index.html;
     error_log  /var/log/nginx/error.log;
     access_log /var/log/nginx/access.log;
-    root /var/www/html/public;
+    root /var/www/html/public_html;
+    set $php_fpm_document_root /var/www/html/public_html;
 
     location ~ \.php$ {
         try_files $uri =404;
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        fastcgi_pass php7_2_15:9000;
+        fastcgi_pass backend_php;
         fastcgi_index index.php;
         include fastcgi_params;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param SCRIPT_FILENAME $php_fpm_document_root$fastcgi_script_name;
         fastcgi_param PATH_INFO $fastcgi_path_info;
     }
 }
 
 server {
-    server_name ${NGINX_HOST};
+    server_name local.enpii.com;
 
     listen 443 ssl;
     fastcgi_param HTTPS on;
@@ -38,15 +43,16 @@ server {
     index index.php index.html;
     error_log  /var/log/nginx/error.log;
     access_log /var/log/nginx/access.log;
-    root /var/www/html/public;
+    root /var/www/html/public_html;
+    set $php_fpm_document_root /var/www/html/public_html;
 
     location ~ \.php$ {
         try_files $uri =404;
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        fastcgi_pass php7_2_15:9000;
+        fastcgi_pass backend_php;
         fastcgi_index index.php;
         include fastcgi_params;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param SCRIPT_FILENAME $php_fpm_document_root$fastcgi_script_name;
         fastcgi_param PATH_INFO $fastcgi_path_info;
     }
 }

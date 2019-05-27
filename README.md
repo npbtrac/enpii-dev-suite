@@ -57,12 +57,11 @@ This project use the following ports :
 - Change directory to the directory to use
 ```sh
 cd <path/to/project-directory>
+./scripts/init.sh
 ```
-For Mac use, it's better to create it inside your home, e.g `<path/to/project-directory>` = `~/workspace/dev-tools/`
-- Copy `docker-compose.yml.example` to `docker-compose.yml` and adjust it with your machine folders but keep in mind that, all folder needs to be in your home folder scope.
-```sh
-cp docker-compose.yml.example docker-compose.yml
-```
+`chmod +x /scripts/init.sh` if you can't execute it
+For Mac use, it's better to create it inside your home, e.g `<path/to/project-directory>` = `~/workspace/enpii-dev-suite/`
+- Repair params on `docker-compose.yml` of `etc/*.conf` or `etc/*.ini` files to match your local
 - Run Docker Compose
 ```sh
 docker-compose up -d
@@ -72,7 +71,8 @@ docker-compose up -d
   - PHP-FPM (PHP execution server)
   - ElasticSearch
   - Redis
-  - We don't want to include MySQL in docker because we believe database is important and you may lose you db once docker failed. Using a database server on local machine is out proposal: use `host.docker.internal` for the hostname to connect
+  - phpmyadmin (should connect to mysql via host host.docker.internal)
+  - We include MySQL in docker containers but because we believe database is important and you may lose you db once docker failed. Using a database server on local machine is out proposal: use `host.docker.internal` for the hostname to connect
 
 ___
 
