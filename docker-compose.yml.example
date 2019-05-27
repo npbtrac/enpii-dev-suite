@@ -1,0 +1,80 @@
+version: "3.5"
+networks:
+  enpii_dev_suite:
+    name: enpii_dev_suite_default
+services:
+    redis:
+        container_name: enpii_dev_suite_redis
+        image: redis
+        networks:
+            - enpii_dev_suite
+        ports:
+            - "6379:6379"
+        volumes:
+            - ../data/redis:/data # Remember to replace `../data` with your actual data folder
+        restart: always
+    nginx:
+        image: nginx:alpine
+        container_name: enpii_dev_suite_nginx_main
+        networks:
+            - enpii_dev_suite
+        volumes:
+            - "./etc/nginx:/etc/nginx/conf.d"
+            - "./etc/ssl:/etc/ssl"
+            - "../www:/var/www/html" # Remember to replace `../www` with your actual www folder
+            - "./log/nginx:/var/log/nginx"
+        ports:
+            - "80:80"
+            - "443:443"
+        environment:
+            - NGINX_HOST=${NGINX_HOST}
+        command: /bin/sh -c "envsubst '$$NGINX_HOST' < /etc/nginx/conf.d/default.conf.example > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+        restart: always
+    php5_6:
+        image: nanoninja/php-fpm:5.6.40
+        container_name: enpii_dev_suite_php56_main
+        restart: always
+        networks:
+            - enpii_dev_suite
+        volumes:
+            - "./etc/php/php56.ini:/usr/local/etc/php/conf.d/php.ini"
+            # - "./etc/php/php56-fpm.conf:/usr/local/etc/php-fpm.conf"
+            # - "./etc/php/php56-fpm.d/www.conf:/usr/local/etc/php-fpm.d/www.conf"
+            - "../www:/var/www/html" # # Remember to replace `../www` with your actual data folder
+    php7_2:
+        image: nanoninja/php-fpm:7.2.15
+        container_name: enpii_dev_suite_php72_main
+        networks:
+            - enpii_dev_suite
+        restart: always
+        volumes:
+            - "./etc/php/php.ini:/usr/local/etc/php/conf.d/php.ini"
+            - "./etc/php/php-fpm.conf:/usr/local/etc/php-fpm.conf"
+            - "./etc/php/php-fpm.d/www.conf:/usr/local/etc/php-fpm.d/www.conf"
+            - "../www:/var/www/html" # # Remember to replace `../www` with your actual data folder
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: enpii_dev_suite_phpmyadmin
+        ports:
+            - "8090:80"
+        environment:
+            - PMA_ARBITRARY=1
+        restart: always
+    mysql_main:
+        image: mysql:${MYSQL_VERSION}
+        container_name: enpii_dev_suite_mysql_main
+        networks:
+            - enpii_dev_suite
+        restart: always
+        env_file:
+            - ".env"
+        environment:
+            - MYSQL_DATABASE=${MYSQL_DATABASE}
+            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+            - MYSQL_USER=${MYSQL_USER}
+            - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        ports:
+            - "8899:3306"
+        volumes:
+            - "../data/db/mysql:/var/lib/mysql" # Replace with your data folder
+            - "./etc/mysql:/etc/mysql"
