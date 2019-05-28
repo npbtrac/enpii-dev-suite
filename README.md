@@ -40,7 +40,7 @@ Check Docker Compose compatibility :
 
 * [Nginx](https://hub.docker.com/_/nginx/)
 * [PHP-FPM](https://hub.docker.com/r/nanoninja/php-fpm/)
-* [ElasticSearch](https://docker.elastic.co/elasticsearch/elasticsearch)
+* [ElasticSearch](https://hub.docker.com/_/elasticsearch)
 * [Redis](https://hub.docker.com/_/redis/)
 * [Generate Certificate](https://hub.docker.com/r/jacoelho/generate-certificate/)
 
@@ -53,33 +53,98 @@ This project use the following ports :
 
 
 ## Installation
-- Clone or download the project
-- Change directory to the directory to use
-```sh
-cd <path/to/project-directory>
-./scripts/init.sh
+### Clone the project
+### Create root directory for your website
+### Config docker-compose.yml
+
+### Create nginx conf file
+- Create a file called `loi-local.dev-srv.net.conf` to put to `etc/nginx/sites-enabled` in clone directory with the following content:
 ```
-`chmod +x /scripts/init.sh` if you can't execute it
-For Mac use, it's better to create it inside your home, e.g `<path/to/project-directory>` = `~/workspace/enpii-dev-suite/`
-- Repair params on `docker-compose.yml` of `etc/*.conf` or `etc/*.ini` files to match your local
-- Run Docker Compose
-```sh
-docker-compose up -d
+server {
+    listen 80;
+    listen [::]:80;
+    server_name loi-local.dev-srv.net;
+
+    index index.php index.html;
+    error_log  /var/log/nginx/loi-local-dev-srv-error.log;  
+    access_log /var/log/nginx/loi-local-dev-srv-access.log;
+    root /var/www/html/public_html;
+    set $php_fpm_document_root /var/www/html/public_html;
+
+    location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass backend_php;
+        fastcgi_index index.php;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $php_fpm_document_root$fastcgi_script_name;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
+    }
+}
+
+
+server {
+    server_name loi-local.dev-srv.net;
+
+    listen 443 ssl;
+    fastcgi_param HTTPS on;
+
+    ssl_certificate /etc/ssl/server.pem;
+    ssl_certificate_key /etc/ssl/server.key;
+    ssl_protocols SSLv3 TLSv1 TLSv1.1 TLSv1.2;
+
+    index index.php index.html;
+    error_log  /var/log/nginx/loi-local-dev-srv-error.log;
+    access_log /var/log/nginx/loi-local-dev-srv-access.log;
+    root /var/www/html/public_html;
+    set $php_fpm_document_root /var/www/html/public_html;
+
+    location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass backend_php;
+        fastcgi_index index.php;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $php_fpm_document_root$fastcgi_script_name;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
+    }
+}
+
+include /etc/nginx/conf.d/sites-enabled/*.conf;
+
 ```
-- Wait for several mins and you'll have:
-  - Nginx (work as a webserver)
-  - PHP-FPM (PHP execution server)
-  - ElasticSearch
-  - Redis
-  - phpmyadmin (should connect to mysql via host host.docker.internal)
-  - We include MySQL in docker containers but because we believe database is important and you may lose you db once docker failed. Using a database server on local machine is out proposal: use `host.docker.internal` for the hostname to connect
+As we replaced the actual data folders in `docker-compose.yml` file, remember to put the right directory which is alias in docker:
 
-___
+`../www:/var/www/html` 
 
+=> `../www`: is your actual directory of the root folder.
+=> `:/var/www/html`: is the directory reflected by docker, and it will operate in this directory.
 
+Then check and restart nginx with the following commands:
+```sh
+docker exec -it <nginx-containter-name> nginx -t 
+docker exec -it <nginx-containter-name> nginx -s reload
+```
+to have that domain name working `http://loi-local.dev-srv.net` and `https://loi-local.dev-srv.net`.
 
-___
+### Assign domain to localhost IP
+- Open /etc/hosts   
+        Add `127.0.0.1 loi-local.dev-srv.net` at the bottom
+- Save & exit, then test your domain on the browser, you should see the content of the phpinfo file displayed.
+
+### Add SSL certificate
+When we use the domain `https://loi-local.dev-srv.net`, an error will occur:
+
+```sh 
+Error: Connection is not private (err_cert_authority_invalid)
+```
+
+This means the browser can not find the valid authority to this connection and ask if we want to proceed or not which may harm your machine.
+
+In this case, we will proceed it as we already set up the authority personally which means it will not be issued by the third party.
+
+## Problem
 
 ## Help us
 
-Any thought, feedback or (hopefully not!).
+Any thought, feedback or (hopefully not!)
