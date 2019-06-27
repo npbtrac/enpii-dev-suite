@@ -1,0 +1,1 @@
+FROM nanoninja/php-fpm:7.2.15
