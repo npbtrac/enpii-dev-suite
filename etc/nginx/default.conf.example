@@ -11,13 +11,17 @@ upstream backend_php_56 {
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
-    server_name local.enpii.com;
+    server_name _;
 
     index index.php index.html;
     error_log  /var/log/nginx/error.log;
     access_log /var/log/nginx/access.log;
-    root /var/www/html/public_html;
-    set $php_fpm_document_root /var/www/html/public_html;
+    root /var/www;
+    set $php_fpm_document_root /var/www;
+
+    location / {
+        autoindex on;
+    }
 
     location ~ \.php$ {
         try_files $uri =404;
@@ -31,20 +35,23 @@ server {
 }
 
 server {
-    server_name local.enpii.com;
-
     listen 443 ssl;
+    server_name _;
     fastcgi_param HTTPS on;
 
-    ssl_certificate /etc/ssl/server.pem;
-    ssl_certificate_key /etc/ssl/server.key;
+    ssl_certificate /etc/ssl/ca.pem;
+    ssl_certificate_key /etc/ssl/ca-key.pem;
     ssl_protocols SSLv3 TLSv1 TLSv1.1 TLSv1.2;
 
     index index.php index.html;
     error_log  /var/log/nginx/error.log;
     access_log /var/log/nginx/access.log;
-    root /var/www/html/public_html;
-    set $php_fpm_document_root /var/www/html/public_html;
+    root /var/www;
+    set $php_fpm_document_root /var/www;
+
+    location / {
+        autoindex on;
+    }
 
     location ~ \.php$ {
         try_files $uri =404;

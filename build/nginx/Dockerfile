@@ -1,4 +1,9 @@
-FROM nginx:alpine
+ARG NGINX_VERSION
 
-ADD . .
+FROM nginx:${NGINX_VERSION}-alpine
+
+WORKDIR /var/www
 CMD /bin/sh /scripts/init-nginx.sh
+
+RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
+    ln -sf /dev/stderr /var/log/nginx/error.log

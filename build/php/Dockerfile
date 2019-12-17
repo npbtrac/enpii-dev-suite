@@ -1,4 +1,6 @@
-FROM php:7.2.25-fpm-alpine
+ARG PHP_VERSION
+
+FROM php:${PHP_VERSION}-fpm-alpine
 
 # Credits
 # https://github.com/daper/docker-alpine-php/
@@ -18,7 +20,7 @@ RUN printf "\n%s\n%s" "@edge http://dl-cdn.alpinelinux.org/alpine/edge/main" "@t
 # 1 "../ext/common.docker" 1
 
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install -j$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) gd gmp mysqli opcache pdo_mysql sockets
+    && docker-php-ext-install -j$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) gd musqli pdo_mysql sockets gmp
 # 9 "Dockerfile.in" 2
 # 1 "../ext/amqp.docker" 1
 
@@ -93,9 +95,9 @@ RUN mv composer.phar /usr/local/bin/composer
 
 # 1 "../conf.docker" 1
 
-COPY php72.ini /usr/local/etc/php/conf.d/custom.ini
-COPY fpm.conf /usr/local/etc/php-fpm.d/zzz-fpm.conf
-WORKDIR /var/www
+#COPY php.ini /usr/local/etc/php/conf.d/custom.ini
+#COPY fpm.conf /usr/local/etc/php-fpm.d/zzz-fpm.conf
+#WORKDIR /var/www
 # 22 "Dockerfile.in" 2
 
 # 1 "../clean.docker" 1

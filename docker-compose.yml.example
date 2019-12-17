@@ -1,23 +1,23 @@
 version: "3.5"
 networks:
-  enpii_dev_suite:
-    name: enpii_dev_suite_default
+  {{DEV_NAMESPACE}}:
+    name: {{DEV_NAMESPACE}}_default
 services:
     nginx:
-        container_name: enpii_dev_suite_nginx_main
+        container_name: {{DEV_NAMESPACE}}_nginx_main
         networks:
-            - enpii_dev_suite
+            - {{DEV_NAMESPACE}}
         build:
             context: "./build/nginx"
         volumes:
             - "./scripts:/scripts"
             - "./etc/nginx:/etc/nginx/conf.d"
             - "./etc/ssl:/etc/ssl"
-            - "../www:/var/www/html" # Remember to replace `../www` with your actual www folder
+            - "../www:/var/www" # Remember to replace `../www` with your actual www folder
             - "./log/nginx:/var/log/nginx"
         ports:
-            - "80:80"
-            - "443:443"
+            - "${NGINX_HTTP_EXPOSING_PORT}:80"
+            - "${NGINX_HTTPS_EXPOSING_PORT}:443"
         environment:
             - NGINX_HOST=${NGINX_HOST}
         # command: /bin/sh -c "envsubst '$$NGINX_HOST' < /etc/nginx/conf.d/default.conf.example > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
@@ -25,43 +25,43 @@ services:
     php5_6:
         build:
             context: "./build/php56"
-        container_name: enpii_dev_suite_php56_main
+        container_name: {{DEV_NAMESPACE}}_php56_main
         restart: always
         networks:
-            - enpii_dev_suite
+            - {{DEV_NAMESPACE}}
         volumes:
             - "./scripts:/scripts"
             - "./etc/php/php56.ini:/usr/local/etc/php/conf.d/php.ini"
             # - "./etc/php/php56-fpm.conf:/usr/local/etc/php-fpm.conf"
             # - "./etc/php/php56-fpm.d/www.conf:/usr/local/etc/php-fpm.d/www.conf"
-            - "../www:/var/www/html" # # Remember to replace `../www` with your actual data folder
+            - "../www:/var/www" # # Remember to replace `../www` with your actual data folder
     php7_2:
         build:
             context: "./build/php72"
-        container_name: enpii_dev_suite_php72_main
+        container_name: {{DEV_NAMESPACE}}_php72_main
         networks:
-            - enpii_dev_suite
+            - {{DEV_NAMESPACE}}
         restart: always
         volumes:
             - "./etc/php/php.ini:/usr/local/etc/php/conf.d/php.ini"
             - "./etc/php/php-fpm.conf:/usr/local/etc/php-fpm.conf"
             - "./etc/php/php-fpm.d/www.conf:/usr/local/etc/php-fpm.d/www.conf"
-            - "../www:/var/www/html" # # Remember to replace `../www` with your actual data folder
+            - "../www:/var/www" # # Remember to replace `../www` with your actual data folder
     phpmyadmin:
         build:
             context: "./build/phpmyadmin"
-        container_name: enpii_dev_suite_phpmyadmin
+        container_name: {{DEV_NAMESPACE}}_phpmyadmin
         ports:
-            - "8090:80"
+            - "${PHPMYADMIN_WEB_EXPOSING_PORT}:80"
         environment:
             - PMA_ARBITRARY=1
         restart: always
     mysql_main:
         build:
             context: "./build/mysql57"
-        container_name: enpii_dev_suite_mysql_main
+        container_name: {{DEV_NAMESPACE}}_mysql_main
         networks:
-            - enpii_dev_suite
+            - {{DEV_NAMESPACE}}
         restart: always
         env_file:
             - ".env"
@@ -71,7 +71,26 @@ services:
             - MYSQL_USER=${MYSQL_USER}
             - MYSQL_PASSWORD=${MYSQL_PASSWORD}
         ports:
-            - "8899:3306"
+            - "${MYSQL_MAIN_EXPOSING_PORT}:3306"
+        volumes:
+            - "../data/db/mysql:/var/lib/mysql" # Replace with your data folder
+            - "./etc/mysql:/etc/mysql"
+    mysql_slave:
+        build:
+            context: "./build/mysql57"
+        container_name: {{DEV_NAMESPACE}}_mysql_slave
+        networks:
+            - {{DEV_NAMESPACE}}
+        restart: always
+        env_file:
+            - ".env"
+        environment:
+            - MYSQL_DATABASE=${MYSQL_DATABASE}
+            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+            - MYSQL_USER=${MYSQL_USER}
+            - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        ports:
+            - "${MYSQL_SLAVE_EXPOSING_PORT}:3306"
         volumes:
             - "../data/db/mysql:/var/lib/mysql" # Replace with your data folder
             - "./etc/mysql:/etc/mysql"

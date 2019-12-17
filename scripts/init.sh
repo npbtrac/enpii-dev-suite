@@ -1,16 +1,66 @@
-#!/bin/bash
+#!/bin/bash -e
+echo "----------------------------------------"
+echo " PHP Local development with Nginx setup "
+echo "----------------------------------------"
+echo ""
 
-CWD=$(pwd)
+echo "Generate self-signed certs to msdev/etc/ssl ----"
+docker run --rm -v $PWD/etc/ssl:/certs dpyro/alpine-self-signed
+echo ""
 
-cp $CWD/docker-compose.yml.example $CWD/docker-compose.yml
-cp $CWD/.env.example $CWD/.env
+CURRENT_DIR="$PWD"
 
-cp $CWD/etc/nginx/default.conf.example $CWD/etc/nginx/default.conf
+ENV_FILE=$CURRENT_DIR/.env
+if ! [ -f "$ENV_FILE" ]; then
+    cp $ENV_FILE.example $ENV_FILE
+fi
 
-cp $CWD/etc/php/php56.ini.example $CWD/etc/php/php56.ini
-cp $CWD/etc/php/php56-fpm.conf.example $CWD/etc/php/php56-fpm.conf
-cp $CWD/etc/php/php56-fpm.d/www.conf.example $CWD/etc/php/php56-fpm.d/www.conf
+DOCKER_COMPOSE_FILE=$CURRENT_DIR/docker-compose.yml
+if ! [ -f "$DOCKER_COMPOSE_FILE" ]; then
+    cp $DOCKER_COMPOSE_FILE.example $DOCKER_COMPOSE_FILE
+fi
 
-cp $CWD/etc/php/php.ini.example $CWD/etc/php/php.ini
-cp $CWD/etc/php/php-fpm.conf.example $CWD/etc/php/php-fpm.conf
-cp $CWD/etc/php/php-fpm.d/www.conf.example $CWD/etc/php/php-fpm.d/www.conf
+DEV_NAMESPACE=$(grep DEV_NAMESPACE .env | xargs)
+IFS='=' read -ra DEV_NAMESPACE <<< "$DEV_NAMESPACE"
+DEV_NAMESPACE=${DEV_NAMESPACE[1]}
+
+sed -i bak -e "s/{{DEV_NAMESPACE}}/${DEV_NAMESPACE}/g" $CURRENT_DIR/docker-compose.yml
+sed -i bak -e "s/{{DEV_NAMESPACE}}/${DEV_NAMESPACE}/g" $CURRENT_DIR/.env
+
+rm $CURRENT_DIR/docker-compose.ymlbak $CURRENT_DIR/.envbak
+
+NGINX_CONF_FILE=$CURRENT_DIR/etc/nginx/default.conf
+if ! [ -f "$NGINX_CONF_FILE" ]; then
+	cp $NGINX_CONF_FILE.example $NGINX_CONF_FILE
+fi
+
+PHP56_INI_FILE=$CURRENT_DIR/etc/php/php56.ini
+if ! [ -f "$PHP56_INI_FILE" ]; then
+	cp $PHP56_INI_FILE.example $PHP56_INI_FILE
+fi
+
+PHP56_FPM_CONF_FILE=$CURRENT_DIR/etc/php/php56-fpm.conf
+if ! [ -f "$PHP56_FPM_CONF_FILE" ]; then
+	cp $PHP56_FPM_CONF_FILE.example $PHP56_FPM_CONF_FILE
+fi
+
+PHP56_FPM_WWW_CONF_FILE=$CURRENT_DIR/etc/php/php56-fpm.d/www.conf
+if ! [ -f "$PHP56_FPM_WWW_CONF_FILE" ]; then
+	cp $PHP56_FPM_WWW_CONF_FILE.example $PHP56_FPM_WWW_CONF_FILE
+fi
+
+PHP_INI_FILE=$CURRENT_DIR/etc/php/php.ini
+if ! [ -f "$PHP_INI_FILE" ]; then
+	cp $PHP_INI_FILE.example $PHP_INI_FILE
+fi
+
+PHP_FPM_CONF_FILE=$CURRENT_DIR/etc/php/php-fpm.conf
+if ! [ -f "$PHP_FPM_CONF_FILE" ]; then
+	cp $PHP_FPM_CONF_FILE.example $PHP_FPM_CONF_FILE
+fi
+
+PHP_FPM_WWW_CONF_FILE=$CURRENT_DIR/etc/php/php-fpm.d/www.conf
+if ! [ -f "$PHP_FPM_WWW_CONF_FILE" ]; then
+	cp $PHP_FPM_WWW_CONF_FILE.example $PHP_FPM_WWW_CONF_FILE
+fi
+
