@@ -1,3 +1,9 @@
+location / {
+    # This is cool because no php is touched for static content.
+    # include the "?$args" part so non-default permalinks doesn't break when using query string
+    try_files $uri $uri/ /index.php?$args;
+}
+
 location ~ \.php$ {
     add_header X_PHP_FPM_DOCUMENT_ROOT $php_fpm_document_root;
     add_header X_PHP_SCRIPT_NAME $fastcgi_script_name;

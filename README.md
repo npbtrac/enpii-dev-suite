@@ -1,6 +1,4 @@
-# Nginx, PHP-FPM, ElasticSearch, Redis for development - Enpii Team
-
-Docker running Nginx, PHP-FPM, ElasticSearch, Redis (special thanks to https://github.com/nanoninja/docker-nginx-php-mysql.git)
+# Nginx, PHP-FPM, MySql for development - Enpii Team
 
 ## Overview
 
@@ -36,31 +34,16 @@ Check Docker Compose compatibility :
 * [Compose file version 3 reference](https://docs.docker.com/compose/compose-file/)
 
 
-### Images to use
-
-* [Nginx](https://hub.docker.com/_/nginx/)
-* [PHP-FPM](https://hub.docker.com/r/nanoninja/php-fpm/)
-* [ElasticSearch](https://docker.elastic.co/elasticsearch/elasticsearch)
-* [Redis](https://hub.docker.com/_/redis/)
-* [Generate Certificate](https://hub.docker.com/r/jacoelho/generate-certificate/)
-
-This project use the following ports :
-
-| Server     | Port |
-|------------|------|
-| Nginx      |   80 |
-| Nginx SSL  |  443 |
-
-
 ## Installation
 - Clone or download the project
+- Copy `.env.example` -> `.env`
 - Change directory to the directory to use
 ```sh
 cd <path/to/project-directory>
-./scripts/init.sh
+./scripts/init-dev-suite.sh
 ```
-`chmod +x /scripts/init.sh` if you can't execute it
-For Mac use, it's better to create it inside your home, e.g `<path/to/project-directory>` = `~/workspace/enpii-dev-suite/`
+`chmod +x /scripts/init-dev-suite.sh` if you can't execute it
+For Mac user, it's better to create it inside your home, e.g `<path/to/project-directory>` = `~/workspace/enpii-dev-suite/`
 - Repair params on `docker-compose.yml` of `etc/*.conf` or `etc/*.ini` files to match your local
 - Run Docker Compose
 ```sh
@@ -69,10 +52,9 @@ docker-compose up -d
 - Wait for several mins and you'll have:
   - Nginx (work as a webserver)
   - PHP-FPM (PHP execution server)
-  - ElasticSearch
-  - Redis
+  - MySql
   - phpmyadmin (should connect to mysql via host host.docker.internal)
-  - We include MySQL in docker containers but because we believe database is important and you may lose you db once docker failed. Using a database server on local machine is out proposal: use `host.docker.internal` for the hostname to connect
+  - We include MySQL in docker containers but because we believe database is important and you may lose you db once docker failed. Using a database server on local machine is out proposal: use `host.docker.internal` (for mac), `10.0.2.2` (for docker machine) for the hostname to connect to your main machine.
 
 ___
 

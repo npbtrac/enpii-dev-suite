@@ -77,7 +77,7 @@ RUN curl -sS "https://getcomposer.org/installer" | php
 RUN mv composer.phar /usr/local/bin/composer
 
 # Prepare config files
-COPY php72.ini /usr/local/etc/php/conf.d/custom.ini
+COPY php72-custom.ini /usr/local/etc/php/conf.d/custom.ini
 COPY fpm.conf /usr/local/etc/php-fpm.d/zzz-fpm.conf
 WORKDIR /var/www
 
