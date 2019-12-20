@@ -1,11 +1,7 @@
 # Nginx configuration
 
 upstream backend_php {
-    server php7_2:9000       weight=5;
-}
-
-upstream backend_php_56 {
-    server php5_6:9000       weight=5;
+    server php72_primary:9000       weight=5;
 }
 
 server {
