@@ -4,8 +4,6 @@ networks:
         name: {{DEV_NAMESPACE}}_default
 services:
     nginx_main:
-        networks:
-            - {{DEV_NAMESPACE}}
         build:
             args:
                 NGINX_VERSION: ${NGINX_VERSION}
@@ -21,9 +19,9 @@ services:
             - "${NGINX_HTTPS_EXPOSING_PORT}:443"
         environment:
             NGINX_HOST:
-    php72_primary:
         networks:
             - {{DEV_NAMESPACE}}
+    php72_primary:
         build:
             context: "${DEV_SUITE_BASE}/build/php72"
         volumes:
@@ -33,10 +31,10 @@ services:
             - PHP_POST_MAX_SIZE
             - PHP_MEMORY_LIMIT
             - PHP_MAX_EXECUTION_TIME
-            - PHP_MAX_INPUT_TIME
-    php72_secondary:
+            - PHP_MAX_INPUT_TIME 
         networks:
             - {{DEV_NAMESPACE}}
+    php72_secondary:
         build:
             context: "${DEV_SUITE_BASE}/build/php72"
         volumes:
@@ -47,34 +45,21 @@ services:
             - PHP_MEMORY_LIMIT
             - PHP_MAX_EXECUTION_TIME
             - PHP_MAX_INPUT_TIME
-    mysql_master:
-        build:
-            context: "${DEV_SUITE_BASE}/build/mysql57"
-        container_name: {{DEV_NAMESPACE}}_mysql_master
         networks:
             - {{DEV_NAMESPACE}}
-        environment:
-            - MYSQL_DATABASE=${MYSQL_MASTER_DATABASE}
-            - MYSQL_ROOT_PASSWORD=${MYSQL_MASTER_ROOT_PASSWORD}
-            - MYSQL_USER=${MYSQL_MASTER_USER}
-            - MYSQL_PASSWORD=${MYSQL_MASTER_PASSWORD}
-        ports:
-            - "${MYSQL_MASTER_EXPOSING_PORT}:3306"
-    mysql_slave:
+    mysql57:
         build:
             context: "${DEV_SUITE_BASE}/build/mysql57"
-        container_name: {{DEV_NAMESPACE}}_mysql_slave
+        container_name: {{DEV_NAMESPACE}}_mysql57
+        environment:
+            - MYSQL_DATABASE=${MYSQL57_DATABASE}
+            - MYSQL_ROOT_PASSWORD=${MYSQL57_ROOT_PASSWORD}
+            - MYSQL_USER=${MYSQL57_USER}
+            - MYSQL_PASSWORD=${MYSQL57_PASSWORD}
+        ports:
+            - "${MYSQL57_EXPOSING_PORT}:3306"
         networks:
             - {{DEV_NAMESPACE}}
-        environment:
-            - MYSQL_DATABASE=${MYSQL_SLAVE_DATABASE}
-            - MYSQL_ROOT_PASSWORD=${MYSQL_SLAVE_ROOT_PASSWORD}
-            - MYSQL_USER=${MYSQL_SLAVE_USER}
-            - MYSQL_PASSWORD=${MYSQL_SLAVE_PASSWORD}
-        ports:
-            - "${MYSQL_SLAVE_EXPOSING_PORT}:3306"
-        depends_on:
-            - mysql_master
     phpmyadmin:
         build:
             context: "./build/phpmyadmin"
@@ -83,3 +68,6 @@ services:
             - "${PHPMYADMIN_WEB_EXPOSING_PORT}:80"
         environment:
             - PMA_ARBITRARY=1
+        networks:
+            - {{DEV_NAMESPACE}}
+
