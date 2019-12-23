@@ -1,0 +1,15 @@
+{
+  "name": "enpii/enpii-dev-suite",
+  "description": "Development Suite used for Enpii. We shared it to all",
+  "type": "dev-suite",
+  "authors": [
+    {
+      "name": "Trac Nguyen",
+      "email": "npbtrac@yahoo.com"
+    },
+    {
+      "name": "Enpii Team",
+      "email": "contact@enpii.com"
+    }
+  ]
+}

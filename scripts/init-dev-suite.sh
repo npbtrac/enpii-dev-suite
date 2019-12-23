@@ -15,12 +15,15 @@ if ! [ -f "$DOCKER_COMPOSE_FILE" ]; then
     cp $DOCKER_COMPOSE_FILE.example $DOCKER_COMPOSE_FILE
 fi
 
-DEV_NAMESPACE=$(grep DEV_NAMESPACE .env | xargs)
-IFS='=' read -ra DEV_NAMESPACE <<< "$DEV_NAMESPACE"
-DEV_NAMESPACE=${DEV_NAMESPACE[1]}
+if [ -n "$1" ]; then
+	DEV_NAMESPACE=$1
+else 
+	DEV_NAMESPACE=$(grep DEV_NAMESPACE .env | xargs)
+	IFS='=' read -ra DEV_NAMESPACE <<< "$DEV_NAMESPACE"
+	DEV_NAMESPACE=${DEV_NAMESPACE[1]}
+fi
 
 sed -i bak -e "s/{{DEV_NAMESPACE}}/${DEV_NAMESPACE}/g" $CURRENT_DIR/docker-compose.yml
-sed -i bak -e "s/{{DEV_NAMESPACE}}/${DEV_NAMESPACE}/g" $CURRENT_DIR/.env
 
 rm $CURRENT_DIR/docker-compose.ymlbak
 

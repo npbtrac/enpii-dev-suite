@@ -12,7 +12,7 @@ services:
             - "./scripts:/scripts"
             - "./etc/nginx:/etc/nginx/conf.d"
             - "./etc/ssl:/etc/ssl"
-            - "${WWW_DIR}:/var/www"
+            - "${WWW_DIR}:/var/www/html"
             - "${NGINX_LOG_DIR}:/var/log/nginx"
         ports:
             - "${NGINX_HTTP_EXPOSING_PORT}:80"
@@ -25,7 +25,7 @@ services:
         build:
             context: "${DEV_SUITE_BASE}/build/php72"
         volumes:
-            - "${WWW_DIR}:/var/www"
+            - "${WWW_DIR}:/var/www/html"
         environment:
             - PHP_UPLOAD_MAX_FILEZISE
             - PHP_POST_MAX_SIZE
@@ -34,11 +34,13 @@ services:
             - PHP_MAX_INPUT_TIME 
         networks:
             - {{DEV_NAMESPACE}}
+        depends_on:
+            - nginx_main
     php72_secondary:
         build:
             context: "${DEV_SUITE_BASE}/build/php72"
         volumes:
-            - "${WWW2_DIR}:/var/www"
+            - "${WWW2_DIR}:/var/www/html"
         environment:
             - PHP_UPLOAD_MAX_FILEZISE
             - PHP_POST_MAX_SIZE
@@ -47,6 +49,24 @@ services:
             - PHP_MAX_INPUT_TIME
         networks:
             - {{DEV_NAMESPACE}}
+        depends_on:
+            - nginx_main
+    php74_primary:
+        build:
+            context: "${DEV_SUITE_BASE}/build/php74"
+        volumes:
+            - "${WWW_DIR}:/var/www/html"
+        environment:
+            - PHP_UPLOAD_MAX_FILEZISE
+            - PHP_POST_MAX_SIZE
+            - PHP_MEMORY_LIMIT
+            - PHP_MAX_EXECUTION_TIME
+            - PHP_MAX_INPUT_TIME 
+        networks:
+            - {{DEV_NAMESPACE}}
+        depends_on:
+            - nginx_main
+            - php72_primary
     mysql57:
         build:
             context: "${DEV_SUITE_BASE}/build/mysql57"

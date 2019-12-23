@@ -40,6 +40,10 @@ Check Docker Compose compatibility :
 - Change directory to the directory to use
 ```sh
 cd <path/to/project-directory>
+# Init the .env file, then you can repair value needed to be updated
+./scripts/init-env-file.sh 
+
+# Init dev suite, you can add first option for the namespace of dev suite to overwrite the one in .env file
 ./scripts/init-dev-suite.sh
 ```
 `chmod +x /scripts/init-dev-suite.sh` if you can't execute it
