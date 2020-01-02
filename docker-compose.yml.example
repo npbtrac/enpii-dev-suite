@@ -8,6 +8,7 @@ services:
             args:
                 NGINX_VERSION: ${NGINX_VERSION}
             context: "${DEV_SUITE_BASE}/build/nginx"
+        container_name: {{DEV_NAMESPACE}}_nginx_main
         volumes:
             - "./scripts:/scripts"
             - "./etc/nginx:/etc/nginx/conf.d"
@@ -21,26 +22,12 @@ services:
             NGINX_HOST:
         networks:
             - {{DEV_NAMESPACE}}
-    php72_primary:
+    php72:
         build:
             context: "${DEV_SUITE_BASE}/build/php72"
+        container_name: {{DEV_NAMESPACE}}_php72
         volumes:
             - "${WWW_DIR}:/var/www/html"
-        environment:
-            - PHP_UPLOAD_MAX_FILEZISE
-            - PHP_POST_MAX_SIZE
-            - PHP_MEMORY_LIMIT
-            - PHP_MAX_EXECUTION_TIME
-            - PHP_MAX_INPUT_TIME 
-        networks:
-            - {{DEV_NAMESPACE}}
-        depends_on:
-            - nginx_main
-    php72_secondary:
-        build:
-            context: "${DEV_SUITE_BASE}/build/php72"
-        volumes:
-            - "${WWW2_DIR}:/var/www/html"
         environment:
             - PHP_UPLOAD_MAX_FILEZISE
             - PHP_POST_MAX_SIZE
@@ -51,9 +38,22 @@ services:
             - {{DEV_NAMESPACE}}
         depends_on:
             - nginx_main
-    php74_primary:
+    php72_composer:
         build:
-            context: "${DEV_SUITE_BASE}/build/php74"
+            context: "${DEV_SUITE_BASE}/build/php72-composer"
+        container_name: {{DEV_NAMESPACE}}_php72_composer
+        networks:
+            - {{DEV_NAMESPACE}}
+    php72_wp:
+        build:
+            context: "${DEV_SUITE_BASE}/build/php72-wp"
+        container_name: {{DEV_NAMESPACE}}_php72_wp
+        networks:
+            - {{DEV_NAMESPACE}}
+    php72_secondary:
+        build:
+            context: "${DEV_SUITE_BASE}/build/php72"
+        container_name: {{DEV_NAMESPACE}}_php72_secondary
         volumes:
             - "${WWW_DIR}:/var/www/html"
         environment:
@@ -61,12 +61,55 @@ services:
             - PHP_POST_MAX_SIZE
             - PHP_MEMORY_LIMIT
             - PHP_MAX_EXECUTION_TIME
-            - PHP_MAX_INPUT_TIME 
+            - PHP_MAX_INPUT_TIME
+        networks:
+            - {{DEV_NAMESPACE}}
+        depends_on:
+            - php72
+    php74:
+        build:
+            context: "${DEV_SUITE_BASE}/build/php74"
+        container_name: {{DEV_NAMESPACE}}_php74
+        volumes:
+            - "${WWW_DIR}:/var/www/html"
+        environment:
+            - PHP_UPLOAD_MAX_FILEZISE
+            - PHP_POST_MAX_SIZE
+            - PHP_MEMORY_LIMIT
+            - PHP_MAX_EXECUTION_TIME
+            - PHP_MAX_INPUT_TIME
         networks:
             - {{DEV_NAMESPACE}}
         depends_on:
             - nginx_main
-            - php72_primary
+    php74_composer:
+        build:
+            context: "${DEV_SUITE_BASE}/build/php74-composer"
+        container_name: {{DEV_NAMESPACE}}_php74_composer
+        networks:
+            - {{DEV_NAMESPACE}}
+    php74_wp:
+        build:
+            context: "${DEV_SUITE_BASE}/build/php74-wp"
+        container_name: {{DEV_NAMESPACE}}_php74_wp
+        networks:
+            - {{DEV_NAMESPACE}}
+    php74_secondary:
+        build:
+            context: "${DEV_SUITE_BASE}/build/php74"
+        container_name: {{DEV_NAMESPACE}}_php74_secondary
+        volumes:
+            - "${WWW_DIR}:/var/www/html"
+        environment:
+            - PHP_UPLOAD_MAX_FILEZISE
+            - PHP_POST_MAX_SIZE
+            - PHP_MEMORY_LIMIT
+            - PHP_MAX_EXECUTION_TIME
+            - PHP_MAX_INPUT_TIME
+        networks:
+            - {{DEV_NAMESPACE}}
+        depends_on:
+            - php74
     mysql57:
         build:
             context: "${DEV_SUITE_BASE}/build/mysql57"
@@ -76,8 +119,55 @@ services:
             - MYSQL_ROOT_PASSWORD=${MYSQL57_ROOT_PASSWORD}
             - MYSQL_USER=${MYSQL57_USER}
             - MYSQL_PASSWORD=${MYSQL57_PASSWORD}
+        volumes:
+            - type: volume
+              source: mysql57-data
+              target: /var/lib/mysql
         ports:
             - "${MYSQL57_EXPOSING_PORT}:3306"
+        networks:
+            - {{DEV_NAMESPACE}}
+    mysql57_slave:
+        build:
+            context: "${DEV_SUITE_BASE}/build/mysql57"
+        container_name: {{DEV_NAMESPACE}}_mysql57_slave
+        environment:
+            - MYSQL_DATABASE=${MYSQL57_DATABASE}
+            - MYSQL_ROOT_PASSWORD=${MYSQL57_ROOT_PASSWORD}
+            - MYSQL_USER=${MYSQL57_SLAVE_USER}
+            - MYSQL_PASSWORD=${MYSQL57_SLAVE_PASSWORD}
+        ports:
+            - "${MYSQL57_SLAVE_EXPOSING_PORT}:3306"
+        networks:
+            - {{DEV_NAMESPACE}}
+    mysql80:
+        build:
+            context: "${DEV_SUITE_BASE}/build/mysql80"
+        container_name: {{DEV_NAMESPACE}}_mysql80
+        environment:
+            - MYSQL_DATABASE=${MYSQL80_DATABASE}
+            - MYSQL_ROOT_PASSWORD=${MYSQL80_ROOT_PASSWORD}
+            - MYSQL_USER=${MYSQL80_USER}
+            - MYSQL_PASSWORD=${MYSQL80_PASSWORD}
+        volumes:
+            - type: volume
+              source: mysql80-data
+              target: /var/lib/mysql
+        ports:
+            - "${MYSQL80_EXPOSING_PORT}:3306"
+        networks:
+            - {{DEV_NAMESPACE}}
+    mysql80_slave:
+        build:
+            context: "${DEV_SUITE_BASE}/build/mysql80"
+        container_name: {{DEV_NAMESPACE}}_mysql80_slave
+        environment:
+            - MYSQL_DATABASE=${MYSQL80_DATABASE}
+            - MYSQL_ROOT_PASSWORD=${MYSQL80_ROOT_PASSWORD}
+            - MYSQL_USER=${MYSQL80_USER}
+            - MYSQL_PASSWORD=${MYSQL80_PASSWORD}
+        ports:
+            - "${MYSQL80_SLAVE_EXPOSING_PORT}:3306"
         networks:
             - {{DEV_NAMESPACE}}
     phpmyadmin:
@@ -90,4 +180,18 @@ services:
             - PMA_ARBITRARY=1
         networks:
             - {{DEV_NAMESPACE}}
-
+    phpmyadmin_slave:
+        build:
+            context: "./build/phpmyadmin"
+        container_name: {{DEV_NAMESPACE}}_phpmyadmin_slave
+        ports:
+            - "${PHPMYADMIN_SLAVE_WEB_EXPOSING_PORT}:80"
+        environment:
+            - PMA_ARBITRARY=1
+        networks:
+            - {{DEV_NAMESPACE}}
+volumes:
+    mysql57-data:
+        driver: local
+    mysql80-data:
+        driver: local

@@ -62,7 +62,18 @@ docker-compose up -d
 
 ___
 
+For PHP composer
+- Run the PHP composer container which your project folder on local machine bound to `/var/www/html` of composer container
+```bash 
+docker-compose run -v /path/to/your/project/folder:/var/www/html php74_composer composer update
+```
+Similar thing if you want to use php72 (use php72_composer instead)
 
+For WP CLI
+```bash
+docker-compose run -v /path/to/your/project/folder:/var/www/html php74_wp wp --allow-root plugin list
+```
+Similar thing if you want to use php72 (use php72_wp instead)
 
 ___
 

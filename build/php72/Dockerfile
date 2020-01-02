@@ -44,15 +44,6 @@ RUN pecl install mongodb \
 RUN pecl install apcu \
     && docker-php-ext-enable apcu
 
-# Install xdebug
-RUN git clone --depth 1 "https://github.com/xdebug/xdebug" \
- && cd xdebug \
- && phpize \
- && ./configure \
- && make \
- && make install \
- && docker-php-ext-enable xdebug
-
 # Install imagemagick
 RUN apk add imagemagick-dev \
     && printf "\n" | pecl install imagick \
@@ -72,14 +63,31 @@ RUN apk add libssh2-dev@edge \
 RUN pecl install redis \
     && docker-php-ext-enable redis
 
+# Install xdebug
+RUN git clone --depth 1 "https://github.com/xdebug/xdebug" \
+ && cd xdebug \
+ && phpize \
+ && ./configure \
+ && make \
+ && make install \
+ && docker-php-ext-enable xdebug
+
 # Install composer
 RUN curl -sS "https://getcomposer.org/installer" | php
 RUN mv composer.phar /usr/local/bin/composer
 
+# https://github.com/hirak/prestissimo
+RUN composer global require hirak/prestissimo
+
+# Install wp-cli
+RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+RUN chmod +x wp-cli.phar
+RUN mv wp-cli.phar /usr/local/bin/wp
+
 # Prepare config files
 COPY php72-custom.ini /usr/local/etc/php/conf.d/custom.ini
 COPY fpm.conf /usr/local/etc/php-fpm.d/zzz-fpm.conf
-WORKDIR /var/www
+WORKDIR /var/www/html
 
 # Cleane cache
 RUN rm -rf /var/cache/apk && mkdir -p /var/cache/apk

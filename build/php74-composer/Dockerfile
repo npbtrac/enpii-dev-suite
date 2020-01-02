@@ -1,4 +1,4 @@
-FROM php:7.4.1-fpm-alpine3.10
+FROM php:7.4.1-cli-alpine3.10
 
 # Credits
 # https://github.com/daper/docker-alpine-php/
@@ -38,15 +38,6 @@ RUN apk add imagemagick-dev \
 RUN pecl install redis \
     && docker-php-ext-enable redis
 
-# Install xdebug
-RUN git clone --depth 1 "https://github.com/xdebug/xdebug" \
- && cd xdebug \
- && phpize \
- && ./configure \
- && make \
- && make install \
- && docker-php-ext-enable xdebug
-
 # Install composer
 RUN curl -sS "https://getcomposer.org/installer" | php
 RUN mv composer.phar /usr/local/bin/composer
@@ -54,14 +45,7 @@ RUN mv composer.phar /usr/local/bin/composer
 # https://github.com/hirak/prestissimo
 RUN composer global require hirak/prestissimo
 
-# Install wp-cli
-RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-RUN chmod +x wp-cli.phar
-RUN mv wp-cli.phar /usr/local/bin/wp
-
 # Prepare config files
-COPY php74-custom.ini /usr/local/etc/php/conf.d/custom.ini
-COPY fpm.conf /usr/local/etc/php-fpm.d/zzz-fpm.conf
 WORKDIR /var/www/html
 
 # Cleane cache

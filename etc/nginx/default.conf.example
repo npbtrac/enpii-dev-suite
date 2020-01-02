@@ -1,7 +1,8 @@
 # Nginx configuration
 
 upstream backend_php {
-    server php72_primary:9000       weight=5;
+    server php74:9000       weight=5;
+    # server php74_secondary:9000       weight=5;
 }
 
 server {
@@ -12,8 +13,8 @@ server {
     index index.php index.html;
     error_log  /var/log/nginx/error.log;
     access_log /var/log/nginx/access.log;
-    root /var/www;
-    set $php_fpm_document_root /var/www;
+    root /var/www/html;
+    set $php_fpm_document_root /var/www/html;
 
     location / {
         autoindex on;
@@ -42,8 +43,12 @@ server {
     index index.php index.html;
     error_log  /var/log/nginx/error.log;
     access_log /var/log/nginx/access.log;
-    root /var/www;
-    set $php_fpm_document_root /var/www;
+    root /var/www/html;
+    set $php_fpm_document_root /var/www/html;
+
+    add_header X-SCRIPT_FILENAME SCRIPT_FILENAME;
+    add_header X-fastcgi_script_name $fastcgi_script_name;
+    add_header X-php_fpm_document_root $php_fpm_document_root;
 
     location / {
         autoindex on;
