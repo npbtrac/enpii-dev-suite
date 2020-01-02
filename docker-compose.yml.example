@@ -22,6 +22,8 @@ services:
             NGINX_HOST:
         networks:
             - {{DEV_NAMESPACE}}
+        depends_on:
+            - php74
     php72:
         build:
             context: "${DEV_SUITE_BASE}/build/php72"
@@ -36,8 +38,6 @@ services:
             - PHP_MAX_INPUT_TIME
         networks:
             - {{DEV_NAMESPACE}}
-        depends_on:
-            - nginx_main
     php72_composer:
         build:
             context: "${DEV_SUITE_BASE}/build/php72-composer"
@@ -80,8 +80,6 @@ services:
             - PHP_MAX_INPUT_TIME
         networks:
             - {{DEV_NAMESPACE}}
-        depends_on:
-            - nginx_main
     php74_composer:
         build:
             context: "${DEV_SUITE_BASE}/build/php74-composer"
