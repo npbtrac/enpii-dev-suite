@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+# Namespace
+DEV_NAMESPACE=enpii_dev_suite
+DEV_SUITE_BASE=.
+
+WWW_DIR=../www
+## Secondary www2 folder to work with multiple php-fpm instance
+WWW2_DIR=../www2
+
+NGINX_LOG_DIR=./log/nignx
+
+
+# Nginx
+NGINX_HOST=enpii-dev-suite.local
+NGINX_VERSION=1.17.6
+## Exposing ports
+NGINX_HTTP_EXPOSING_PORT=11080
+NGINX_HTTPS_EXPOSING_PORT=11443
+
+# PHP 7.2.25
+PHP_MAX_EXECUTION_TIME=60
+PHP_MAX_INPUT_TIME=60
+PHP_UPLOAD_MAX_FILEZISE=128M
+PHP_POST_MAX_SIZE=128M
+PHP_MEMORY_LIMIT=128M
+
+# MySQL 5.7.22
+MYSQL57_DATABASE=mysql57_test
+MYSQL57_ROOT_PASSWORD=mysql57_root
+MYSQL57_USER=mysql57_dev
+MYSQL57_PASSWORD=mysql57_dev
+
+## Exposing ports
+MYSQL57_EXPOSING_PORT=13306
+
+# PhpMyAdmin
+PHPMYADMIN_WEB_EXPOSING_PORT=8099
