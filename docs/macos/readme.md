@@ -19,13 +19,13 @@ $ cd enpii-dev-suite
 ```
 
 The current working folder will be `enpii-dev-suite`. After all the prerequisites have been installed, run the following commands to start the installation of docker images.
-  - This command will check if there’s .env file, if there isn’t, it will init and generate an .env file. Then you can repair values that need to be updated located on your based folder.
+  - This command will check if there’s .env file, if there is not, it will init and generate an .env file. Then you can repair values that need to be updated located on your based folder.
 
 ```
 $ sh scripts/init-env-file.sh
 ```
 
-  - When environment variables have been updated, we will generate the docker-compose.yml and configuration files (nginx conf - How to modify nginx conf can be found here #).
+  - When environment variables have been updated, we will generate the `docker-compose.yml` and configuration files (Nginx conf - How to modify Nginx conf can be found [here](#setupcustomdomain)).
 
 ```
 $ sh scripts/init-dev-suite.sh
@@ -48,18 +48,31 @@ $ docker-compose up -d --build
 $ docker-compose ps
 ```
 
-# Configure the nginx conf
-- Firstly, create two files called `index.html` and `index.php` within folder `<path-to-your-root-directorty>` and input the content:
+# Modify document root directory
+Firstly, create two files called `index.html` and `info.php` within folder `<path-to-document-root-directory>` and input the content:
+- index.html
 
 ```
-<p> It works </p>
+<h1>Webserver works</h1>
 ```
 
-later on, if your web page works, these contents will be shown.
+- info.php
 
-- Before launching the web page, we have to modify the configuration for the `default.conf` file of nginx container, which is located in `etc/nginx`. (Setting can be found here #)
-- Later on, if you want to add configuration for other sites, simply create another conf file for each site and put it into folder `etc/nginx/sites-enabled`.
-- As we replaced the actual data folders in docker-compose.yml file, remember to put the right directory which is alias in docker:
+```
+<?php echo phpinfo();
+```
+
+Later on, if your web page works, these contents will be shown.
+
+We have to modify the configuration for the `default.conf` file of Nginx container before launching. (View more details [here](#setupcustomdomain))
+
+# Set up custom domain
+- Before launching the web page, the configurations for the `default.conf` file of Nginx container need to be modified.
+  - Create a file called `default.conf` from sample `default.conf.example` with folder `etc/nginx` to repair document root. Each site will have its own Ngixn conf file.
+  - Later on, if you want to add configuration for other sites, simply create another conf file for each site and put it into folder `etc/nginx/sites-enabled`.
+    - As what we have in `default.conf`, where php74 is a container in dev suite, according to that, path for $php_fpm_document_root should be path on that php74 and the root is path to file of the Nginx instance. 
+    - We are using Nginx from docker container then the path should be path to file inside that nginx_main container.
+    - In addition, `default.conf` is a file, which has root path is the `enpii-dev-suite` folder, mapped from local machine to docker container. As we replaced the actual data folders in `docker-compose.yml` file, remember to put the right directory which is alias in docker:
 
 ```
 "${WWW_DIR}:/var/www/html"
@@ -67,10 +80,9 @@ later on, if your web page works, these contents will be shown.
 
 `${WWW_DIR}` : is your actual directory of the root folder, which is set in .env file.
 `:/var/www/html` : this is the directory reflected by docker in which it will operate in.
+So the `/var/www/html/` will be the path to `index.html` files on docker.
 
-- So the `/var/www/html/` will be the path to `index.html` files on docker.
-
-- Then check and restart nginx with the following commands: 
+- Then check and restart nginx with the following commands to take effect what modified: 
 
 ```
 $ docker exec -it nginx_main nginx -t 
@@ -97,7 +109,7 @@ $ docker-compose ps nginx_main
 
 - The information of the container will be shown with its state as __“UP”__.
 
-- If its state is shown as __“EXIT”__, that means there is error that nginx could not be started and we should check the log to see the cause.
+- If its state is shown as __“EXIT”__, that means there is error that Nginx could not be started and we should check the log to see the cause.
 
 ```
 $ docker-compose logs nginx_main
@@ -106,21 +118,23 @@ $ docker-compose logs nginx_main
 - To see the logs, usually, errors come from configuration and you can change the configs in `etc/nginx/default.conf`  or `*.conf` in `etc/nginx/sites-enabled` (because we will include all *.conf in that folder to our nginx config).
 
 # Assign your domain to localhost IP
-- Open `/etc/hosts` then add your domain to localhost:
+Open `/etc/hosts` then add your domain to localhost:
 
 ```
 127.0.0.1 your-domain-name.example
 ```
 
-- Save & exit
-- Now test your domain on the browser `http://your-domain-name.example:${NGINX_HTTP_EXPOSING_PORT}` and `https://your-domain-name.example:${NGINX_HTTPS_EXPOSING_PORT}`, you should see the content of file `index.html` shown. 
+Save & exit
+- Now test your domains on the browser `http://your-domain-name.example:${NGINX_HTTP_EXPOSING_PORT}` and `https://your-domain-name.example:${NGINX_HTTPS_EXPOSING_PORT}`, you should see the content of file `index.html` shown. 
+
+- Or `http://your-domain-name.example:${NGINX_HTTP_EXPOSING_PORT}/info.php` and `https://your-domain-name.example:${NGINX_HTTPS_EXPOSING_PORT}/info.php` to check if the `info.php` file works also.
 
 *** Note: Since we have declared 2 variables for ${NGINX_HTTP_EXPOSING_PORT} and ${NGINX_HTTPS_EXPOSING_PORT} in .env file, so to access to the http and https of the web page, these ports should be added to the URL too.
 
 # Set up Mysql Database and Phpmyadmin
 - MySQL is the database system used for the website. We have installed __mysql57__, __mysql57_slave__, __mysql80__ and __mysql80_slave__ so that one of these containers can be used, others are for later, when we want to have replication.
 - In the .env file, the database name, root password (using with root user of local machine), mysql user and password of these mysql containers are set, which we can use to log in through the Phpmyadmin.
-- Phpmyadmin is intended to handle the administration of MySQL over the Web. We can use one of these mysql information declared in docker-compose.yml to log in through Phpmyadmin page: `your-domain-name.example:${PHPMYADMIN_WEB_EXPOSING_PORT}` and `your-domain-name.example:{PHPMYADMIN_SLAVE_WEB_EXPOSING_PORT}`.
+- Phpmyadmin is intended to handle the administration of MySQL over the Web. We can use one of these mysql information declared in `docker-compose.yml` to log in through Phpmyadmin page: `your-domain-name.example:${PHPMYADMIN_WEB_EXPOSING_PORT}` and `your-domain-name.example:{PHPMYADMIN_SLAVE_WEB_EXPOSING_PORT}`.
 - But since the mysql container as well as its database can be deleted once we stop and restart the docker, it's better to use the mysql from the local machine. In this case, the server named `host.docker.internal` is used to mapped to local database.
 - After log in, we can create a database for the website and manage it.
 
