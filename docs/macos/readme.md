@@ -67,9 +67,8 @@ Later on, if your web page works, these contents will be shown.
 We have to modify the configuration for the `default.conf` file of Nginx container before launching. (View more details [here](#set-up-custom-domain))
 
 # Set up custom domain
-- Before launching the web page, the configurations for the `default.conf` file of Nginx container need to be modified.
-  - Create a file called `default.conf` from sample `default.conf.example` with folder `etc/nginx` to repair document root. Each site will have its own Ngixn conf file.
-  - Later on, if you want to add configuration for other sites, simply create another conf file for each site and put it into folder `etc/nginx/sites-enabled`.
+Before launching the web page, the configurations for the `default.conf` file of Nginx container need to be modified.
+- Create a file called `default.conf` from sample `default.conf.example` with folder `etc/nginx` to repair document root. Each site will have its own Ngixn conf file.
     - As what we have in `default.conf`, where php74 is a container in dev suite, according to that, path for $php_fpm_document_root should be path on that php74 and the root is path to file of the Nginx instance. 
     - We are using Nginx from docker container then the path should be path to file inside that nginx_main container.
     - In addition, `default.conf` is a file, which has root path is the `enpii-dev-suite` folder, mapped from local machine to docker container. As we replaced the actual data folders in `docker-compose.yml` file, remember to put the right directory which is alias in docker:
@@ -78,10 +77,15 @@ We have to modify the configuration for the `default.conf` file of Nginx contain
 "${WWW_DIR}:/var/www/html"
 ```
 
-`${WWW_DIR}` : is your actual directory of the root folder, which is set in .env file.
-`:/var/www/html` : this is the directory reflected by docker in which it will operate in.
-So the `/var/www/html/` will be the path to `index.html` files on docker.
+ - `${WWW_DIR}` : is your actual directory of the root folder, which is set in .env file.
+ - `:/var/www/html` : this is the directory reflected by docker in which it will operate in.
+ - So the `/var/www/html/` will be the path to `index.html` files on docker.
 
+- Later on, if you want to add configuration for other sites, simply create another conf file for each site and put it into folder `etc/nginx/sites-enabled`.
+  - Create a file called `sample.conf` from `sample.conf.example` within folder `etc/nginx/sites-enabled` to make changes for document root.
+  - This is similar to the `default.conf` case, but we have to add the other domain site to `server_name` section as well as its root directory, which should be path to file inside the nginx_main containter.
+  - There is a line saying `include /etc/nginx/conf.d/sites-enabled/*.conf;` in `default.conf` means that all configuration files within /etc/nginx/sites-enabled will be included for the process of nginx.
+  
 - Then check and restart nginx with the following commands to take effect what modified: 
 
 ```
@@ -89,7 +93,7 @@ $ docker exec -it nginx_main nginx -t
 $ docker exec -it nginx_main nginx -s reload
 ```
 
-- If it’s still not working, run:
+- If it still does not work, run:
 
 ```
 $ docker-compose down
