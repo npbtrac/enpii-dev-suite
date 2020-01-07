@@ -25,7 +25,7 @@ The current working folder will be `enpii-dev-suite`. After all the prerequisite
 $ sh scripts/init-env-file.sh
 ```
 
-  - When environment variables have been updated, we will generate the `docker-compose.yml` and configuration files (Nginx conf - How to modify Nginx conf can be found [here](#setupcustomdomain)).
+  - When environment variables have been updated, we will generate the `docker-compose.yml` and configuration files (Nginx conf - How to modify Nginx conf can be found [here](#set-up-custom-domain)).
 
 ```
 $ sh scripts/init-dev-suite.sh
@@ -64,7 +64,7 @@ Firstly, create two files called `index.html` and `info.php` within folder `<pat
 
 Later on, if your web page works, these contents will be shown.
 
-We have to modify the configuration for the `default.conf` file of Nginx container before launching. (View more details [here](#setupcustomdomain))
+We have to modify the configuration for the `default.conf` file of Nginx container before launching. (View more details [here](#set-up-custom-domain))
 
 # Set up custom domain
 - Before launching the web page, the configurations for the `default.conf` file of Nginx container need to be modified.
