@@ -10,7 +10,7 @@ services:
             context: "${DEV_SUITE_BASE}/build/nginx"
         container_name: {{DEV_NAMESPACE}}_nginx_main
         volumes:
-            - "./scripts:/scripts"
+            - "./shared:/shared"
             - "./etc/nginx:/etc/nginx/conf.d"
             - "./etc/ssl:/etc/ssl"
             - "${WWW_DIR}:/var/www/html"
@@ -29,6 +29,7 @@ services:
             context: "${DEV_SUITE_BASE}/build/php72-fpm"
         container_name: {{DEV_NAMESPACE}}_php72_fpm
         volumes:
+            - "./shared:/shared"
             - "${WWW_DIR}:/var/www/html"
         environment:
             - PHP_UPLOAD_MAX_FILEZISE
@@ -44,11 +45,12 @@ services:
         container_name: {{DEV_NAMESPACE}}_php72_cli
         networks:
             - {{DEV_NAMESPACE}}
-#    php74_fpm:
+#    php_latest_fpm:
 #        build:
-#            context: "${DEV_SUITE_BASE}/build/php74-fpm"
+#            context: "${DEV_SUITE_BASE}/build/php-latest-fpm"
 #        container_name: {{DEV_NAMESPACE}}_php74_fpm
 #        volumes:
+#            - "./shared:/shared"
 #            - "${WWW_DIR}:/var/www/html"
 #        environment:
 #            - PHP_UPLOAD_MAX_FILEZISE
@@ -58,10 +60,10 @@ services:
 #            - PHP_MAX_INPUT_TIME
 #        networks:
 #            - {{DEV_NAMESPACE}}
-#    php74_cli:
+#    php_latest_cli:
 #        build:
-#            context: "${DEV_SUITE_BASE}/build/php74-cli"
-#        container_name: {{DEV_NAMESPACE}}_php74_cli
+#            context: "${DEV_SUITE_BASE}/build/php-latest-cli"
+#        container_name: {{DEV_NAMESPACE}}_php_latest_cli
 #        networks:
 #            - {{DEV_NAMESPACE}}
     mysql57:
@@ -74,6 +76,7 @@ services:
             - MYSQL_USER=${MYSQL57_USER}
             - MYSQL_PASSWORD=${MYSQL57_PASSWORD}
         volumes:
+            - "./shared:/shared"
             - type: volume
               source: mysql57-data
               target: /var/lib/mysql
@@ -81,19 +84,21 @@ services:
             - "${MYSQL57_EXPOSING_PORT}:3306"
         networks:
             - {{DEV_NAMESPACE}}
-    mysql57_slave:
-        build:
-            context: "${DEV_SUITE_BASE}/build/mysql57"
-        container_name: {{DEV_NAMESPACE}}_mysql57_slave
-        environment:
-            - MYSQL_DATABASE=${MYSQL57_DATABASE}
-            - MYSQL_ROOT_PASSWORD=${MYSQL57_ROOT_PASSWORD}
-            - MYSQL_USER=${MYSQL57_SLAVE_USER}
-            - MYSQL_PASSWORD=${MYSQL57_SLAVE_PASSWORD}
-        ports:
-            - "${MYSQL57_SLAVE_EXPOSING_PORT}:3306"
-        networks:
-            - {{DEV_NAMESPACE}}
+#    mysql57_slave:
+#        build:
+#            context: "${DEV_SUITE_BASE}/build/mysql57"
+#        container_name: {{DEV_NAMESPACE}}_mysql57_slave
+#        environment:
+#            - MYSQL_DATABASE=${MYSQL57_DATABASE}
+#            - MYSQL_ROOT_PASSWORD=${MYSQL57_ROOT_PASSWORD}
+#            - MYSQL_USER=${MYSQL57_SLAVE_USER}
+#            - MYSQL_PASSWORD=${MYSQL57_SLAVE_PASSWORD}
+#        volumes:
+#            - "./shared:/shared"
+#        ports:
+#            - "${MYSQL57_SLAVE_EXPOSING_PORT}:3306"
+#        networks:
+#            - {{DEV_NAMESPACE}}
 #    mysql80:
 #        build:
 #            context: "${DEV_SUITE_BASE}/build/mysql80"
@@ -104,6 +109,7 @@ services:
 #            - MYSQL_USER=${MYSQL80_USER}
 #            - MYSQL_PASSWORD=${MYSQL80_PASSWORD}
 #        volumes:
+#            - "./shared:/shared"
 #            - type: volume
 #              source: mysql80-data
 #              target: /var/lib/mysql
@@ -120,6 +126,8 @@ services:
 #            - MYSQL_ROOT_PASSWORD=${MYSQL80_ROOT_PASSWORD}
 #            - MYSQL_USER=${MYSQL80_USER}
 #            - MYSQL_PASSWORD=${MYSQL80_PASSWORD}
+#        volumes:
+#            - "./shared:/shared"
 #        ports:
 #            - "${MYSQL80_SLAVE_EXPOSING_PORT}:3306"
 #        networks:
