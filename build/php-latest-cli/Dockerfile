@@ -1,0 +1,1 @@
+FROM npbtrac/php:latest-cli
