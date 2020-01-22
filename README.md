@@ -1,14 +1,12 @@
 # Nginx, PHP-FPM, MySql for development - Enpii Team
 
 ## Overview
+This is a development suite for development with PHP. It can be easily deployed with 1 or 2 commands. It includes:
+- Nginx (`nginx_main` for serving as a proxy server)
+- PHP-FPM (`php72_fpm`, `php_latest_fpm` for executing PHP scripts via FastCGI of Nginx)
+- MySQL (`mysql57`, `mysql80` database, we have 5.7 for the stable and 8.0 is latest one)
+- PhpMyAdmin (`phpmyadmin` tool for managing database)
 
-1. [Install prerequisites](#install-prerequisites)
-
-    Before installing project make sure the following prerequisites have been met.
-
-2. [Installation](#installation)
-
-    How to install all tools included
 
 
 ___
