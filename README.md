@@ -63,18 +63,29 @@ ___
 For PHP composer
 - Run the PHP composer container which your project folder on local machine bound to `/var/www/html` of composer container
 ```bash 
-docker-compose run --rm -v /path/to/your/project/folder:/var/www/html php74_composer composer update
+docker-compose run --rm -v /path/to/your/project/folder:/var/www/html php72_cli composer update
 ```
-Similar thing if you want to use php72 (use php72_composer instead)
+
 
 For WP CLI
 ```bash
-docker-compose run --rm -v /path/to/your/project/folder:/var/www/html php74_wp wp --allow-root plugin list
+docker-compose run --rm -v /path/to/your/project/folder:/var/www/html php72_cli wp plugin list
 ```
-Similar thing if you want to use php72 (use php72_wp instead)
+
+For running phpunit
+```bash
+docker-compose run --rm -v /path/to/your/test/folder:/var/www/html php72_cli phpunit
+```
+
+For running codeception test
+```bash
+docker-compose run --rm -v /path/to/your/test/folder:/var/www/html php72_cli codecept
+```
+
+Similar thing if you want to use php_latest (use php_latest_cli instead)
 
 ___
 
 ## Help us
 
-Any thought, feedback or (hopefully not!)
+Any thought, feedback or issues, please put it here https://github.com/npbtrac/enpii-dev-suite/issues
