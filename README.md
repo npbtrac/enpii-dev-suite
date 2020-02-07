@@ -34,11 +34,10 @@ Check Docker Compose compatibility :
 
 ## Installation
 - Clone or download the project
-- Copy `.env.example` -> `.env`
-- Change directory to the directory to use
+- Change directory to the specified directory (default to `enpii-dev-suite`)
 ```sh
 cd <path/to/project-directory>
-# Init the .env file, then you can repair value needed to be updated
+# Init the .env file, then you can repair value needed to be updated, or you can copy `.env.example` -> `.env`
 ./scripts/init-env-file.sh 
 
 # Init dev suite, you can add first option for the namespace of dev suite to overwrite the one in .env file
