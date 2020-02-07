@@ -140,6 +140,7 @@ services:
             - "${PHPMYADMIN_WEB_EXPOSING_PORT}:80"
         environment:
             - PMA_ARBITRARY=1
+            - UPLOAD_LIMIT=512MB
         networks:
             - {{DEV_NAMESPACE}}
 #    phpmyadmin_slave:
@@ -150,6 +151,20 @@ services:
 #            - "${PHPMYADMIN_SLAVE_WEB_EXPOSING_PORT}:80"
 #        environment:
 #            - PMA_ARBITRARY=1
+#            - UPLOAD_LIMIT=512MB
+#        networks:
+#            - {{DEV_NAMESPACE}}
+    ## For SSDB (redis like)
+#    ssdb:
+#        build:
+#            context: "./build/ssdb"
+#        networks:
+#            - {{DEV_NAMESPACE}}
+#    phpssdbadmin:
+#        build:
+#            context: "./build/phpssdbadmin"
+#        ports:
+#            - "${PHPSSDBADMIN_WEB_EXPOSING_PORT}:80"
 #        networks:
 #            - {{DEV_NAMESPACE}}
 volumes:

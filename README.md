@@ -58,31 +58,36 @@ docker-compose up -d
   - phpmyadmin (should connect to mysql via host host.docker.internal)
   - We include MySQL in docker containers but because we believe database is important and you may lose you db once docker failed. Using a database server on local machine is out proposal: use `host.docker.internal` (for mac), `10.0.2.2` (for docker machine) for the hostname to connect to your main machine.
 
-___
+## Using
 
-For PHP composer
+### PHP related commands
+#### PHP composer
 - Run the PHP composer container which your project folder on local machine bound to `/var/www/html` of composer container
 ```bash 
 docker-compose run --rm -v /path/to/your/project/folder:/var/www/html php72_cli composer update
 ```
 
 
-For WP CLI
+#### WP CLI
 ```bash
 docker-compose run --rm -v /path/to/your/project/folder:/var/www/html php72_cli wp plugin list
 ```
 
-For running phpunit
+#### Running phpunit
 ```bash
 docker-compose run --rm -v /path/to/your/test/folder:/var/www/html php72_cli phpunit
 ```
 
-For running codeception test
+#### Running codeception test
 ```bash
 docker-compose run --rm -v /path/to/your/test/folder:/var/www/html php72_cli codecept
 ```
 
 Similar thing if you want to use php_latest (use php_latest_cli instead)
+
+### SSDB (Redis like service but running on SSD)
+- `ssdb` is the instance
+- `phpssdbadmin` is the GUI manager of SSDB, http://<domain-to-instance>:${PHPSSDBADMIN_WEB_EXPOSING_PORT}, user: `admin`, password: `password`
 
 ___
 
