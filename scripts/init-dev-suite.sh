@@ -6,7 +6,7 @@ echo ""
 
 echo "Generate self-signed certs to msdev/etc/ssl ----"
 docker pull dpyro/alpine-self-signed
-docker run --rm -v $PWD/etc/ssl:/certs dpyro/alpine-self-signed
+docker run --rm -v $PWD/etc/ssl:/certs -e CA_EXPIRE=10000 -e SSL_EXPIRE=10000 dpyro/alpine-self-signed
 echo ""
 
 CURRENT_DIR="$PWD"
