@@ -10,6 +10,7 @@ send_timeout 60;
 tcp_nopush on;
 tcp_nodelay on;
 large_client_header_buffers 4 32k;
+server_names_hash_bucket_size 128;
 
 #Adjust output buffers
 fastcgi_buffers 256 48k;
@@ -21,8 +22,17 @@ fastcgi_busy_buffers_size 256k;
 fastcgi_temp_file_write_size 256k;
 fastcgi_max_temp_file_size 0;
 
-upstream backend_php {
+# Work as a global variable, useful when you change php-fpm instance, e.g `set $php_fpm_document_root $global_php_document_root/path/to/your/document/root;`
+map $host $global_php_document_root {
+  default /Users/tracnguyen/workspace/www;
+}
+
+upstream docker_php {
     server php72_fpm:9000;
+}
+
+upstream backend_php {
+    server host.docker.internal:9000;
 }
 
 server {
@@ -34,7 +44,7 @@ server {
     error_log  /var/log/nginx/error.log;
     access_log /var/log/nginx/access.log;
     root /var/www/html;
-    set $php_fpm_document_root /var/www/html;
+    set $php_fpm_document_root $global_php_document_root;
 
     location / {
         autoindex on;
@@ -64,7 +74,7 @@ server {
     error_log  /var/log/nginx/error.log;
     access_log /var/log/nginx/access.log;
     root /var/www/html;
-    set $php_fpm_document_root /var/www/html;
+    set $php_fpm_document_root $global_php_document_root;
 
     add_header X-SCRIPT_FILENAME SCRIPT_FILENAME;
     add_header X-fastcgi_script_name $fastcgi_script_name;
