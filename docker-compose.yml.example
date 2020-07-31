@@ -18,7 +18,7 @@ services:
         environment:
             NGINX_HOST:
         networks:
-            {{DEV_NAMESPACE}}
+            - {{DEV_NAMESPACE}}
     php72_fpm:
         image: npbtrac/php:7.2-fpm
         container_name: {{DEV_NAMESPACE}}_php72_fpm
@@ -33,7 +33,7 @@ services:
             - PHP_MAX_EXECUTION_TIME=120
             - PHP_MAX_INPUT_TIME=90
         networks:
-            {{DEV_NAMESPACE}}
+            - {{DEV_NAMESPACE}}
     # php72_cli:
     #     image: npbtrac/php:7.2-cli
     #     container_name: {{DEV_NAMESPACE}}_php72_cli
@@ -51,7 +51,7 @@ services:
             - PHP_MAX_EXECUTION_TIME=120
             - PHP_MAX_INPUT_TIME=90
         networks:
-            {{DEV_NAMESPACE}}
+            - {{DEV_NAMESPACE}}
     # php_latest_cli:
     #     image: npbtrac/php:latest-cli
     #     container_name: {{DEV_NAMESPACE}}_php_latest_cli
@@ -66,7 +66,7 @@ services:
               source: mariadb-data
               target: /var/lib/mysql
         networks:
-            {{DEV_NAMESPACE}}
+            - {{DEV_NAMESPACE}}
     adminer:
         image: adminer:4.7.7
         volumes:
@@ -80,7 +80,7 @@ services:
             # ADMINER_DEFAULT_DB_HOST: $DB_HOST
             # ADMINER_DEFAULT_DB_NAME: $DB_NAME
         networks:
-            {{DEV_NAMESPACE}}
+            - {{DEV_NAMESPACE}}
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
         ports:
@@ -94,20 +94,20 @@ services:
             - PHP_MAX_INPUT_VARS=1G
             - UPLOAD_LIMIT=1G
         networks:
-            {{DEV_NAMESPACE}}
+            - {{DEV_NAMESPACE}}
     ssdb:
         image: benyoo/ssdb
         volumes:
             - "./etc/ssdb/ssdb.conf:/etc/ssdb.conf"
         networks:
-            {{DEV_NAMESPACE}}
+            - {{DEV_NAMESPACE}}
     phpssdbadmin:
         build:
             context: "./build/phpssdbadmin"
         ports:
             - "${PHPSSDBADMIN_WEB_EXPOSING_PORT}:80"
         networks:
-            {{DEV_NAMESPACE}}
+            - {{DEV_NAMESPACE}}
     redis:
         image: redis
         ports:
@@ -115,7 +115,7 @@ services:
         volumes:
             - "./etc/redis/redis.conf:/usr/local/etc/redis/redis.conf"
         networks:
-            {{DEV_NAMESPACE}}
+            - {{DEV_NAMESPACE}}
     phpredisadmin:
         image: erikdubbelboer/phpredisadmin
         ports:
@@ -128,7 +128,7 @@ services:
             - REDIS_1_HOST=redis
             - REDIS_1_PORT=6379
         networks:
-            {{DEV_NAMESPACE}}
+            - {{DEV_NAMESPACE}}
 volumes:
     mariadb-data:
         driver: local
